@@ -189,11 +189,10 @@ describe('PlaybuxSBT', async () => {
       it('should be decrease after burned', async () => {
         const [deployer, minter, receiver] = await ethers.getSigners();
         expect(await PlaybuxSBT.totalSupply()).to.equal(0);
-        await PlaybuxSBT.connect(deployer).mintTo(receiver.address, '1');
+        await PlaybuxSBT.connect(deployer).mintTo(deployer.address, '1');
         expect(await PlaybuxSBT.totalSupply()).to.equal(1);
-        const tokenId = await PlaybuxSBT.tokenOfOwnerByIndex(receiver.address, 0);
+        const tokenId = await PlaybuxSBT.tokenOfOwnerByIndex(deployer.address, 0);
         // transfer to burn address
-        await PlaybuxSBT.connect(receiver).transferFrom(receiver.address, deployer.address, tokenId);
         await PlaybuxSBT.connect(deployer).burnByTokenId(tokenId);
         expect(await PlaybuxSBT.totalSupply()).to.equal(0);
       });
@@ -256,13 +255,12 @@ describe('PlaybuxSBT', async () => {
 
     it('should be success when call after burn', async () => {
       const [deployer, minter, receiver] = await ethers.getSigners();
-      await PlaybuxSBT.connect(deployer).mintTo(receiver.address, '1');
-      const tokenId = await PlaybuxSBT.tokenOfOwnerByIndex(receiver.address, 0);
+      await PlaybuxSBT.connect(deployer).mintTo(deployer.address, '1');
+      const tokenId = await PlaybuxSBT.tokenOfOwnerByIndex(deployer.address, 0);
       // transfer to burn address
-      await PlaybuxSBT.connect(receiver).transferFrom(receiver.address, deployer.address, tokenId);
       await PlaybuxSBT.connect(deployer).burnByTokenId(tokenId);
-      await PlaybuxSBT.connect(deployer).mintByTokenId(receiver.address, tokenId);
-      expect(await PlaybuxSBT.ownerOf(tokenId)).to.equal(receiver.address);
+      await PlaybuxSBT.connect(deployer).mintByTokenId(deployer.address, tokenId);
+      expect(await PlaybuxSBT.ownerOf(tokenId)).to.equal(deployer.address);
     });
 
     it('should be reverted exists when call with tokenId 1000000000000000001 after minting 1 NFT', async () => {
@@ -452,26 +450,25 @@ describe('PlaybuxSBT', async () => {
     it('#### 1 full case', async () => {
       // 1
       const [deployer, minter, receiver] = await ethers.getSigners();
-      const tx = await PlaybuxSBT.connect(deployer).mintTo(receiver.address, '1');
+      const tx = await PlaybuxSBT.connect(deployer).mintTo(deployer.address, '1');
       const receipt = await tx.wait();
       const tokenId = receipt.events[0].args[2];
       expect(await PlaybuxSBT.totalSupply()).to.equal(1);
 
       // 2
-      const tx2 = await PlaybuxSBT.connect(deployer).mintTo(receiver.address, '1');
+      const tx2 = await PlaybuxSBT.connect(deployer).mintTo(deployer.address, '1');
       const receipt2 = await tx2.wait();
       const tokenId2 = receipt2.events[0].args[2];
       expect(await PlaybuxSBT.totalSupply()).to.equal(2);
 
       // 3
-      await PlaybuxSBT.connect(receiver).transferFrom(receiver.address, deployer.address, tokenId);
       await PlaybuxSBT.connect(deployer).burnByTokenId(tokenId);
       const supply = await PlaybuxSBT.tokenSupplyByType('1');
       expect(supply).to.equal(2);
       expect(await PlaybuxSBT.totalSupply()).to.equal(1);
 
       // 4
-      const tx3 = await PlaybuxSBT.connect(deployer).mintByTokenId(receiver.address, tokenId);
+      const tx3 = await PlaybuxSBT.connect(deployer).mintByTokenId(deployer.address, tokenId);
 
       const receipt3 = await tx3.wait();
       const tokenId3 = receipt3.events[0].args[2];
@@ -479,17 +476,17 @@ describe('PlaybuxSBT', async () => {
       expect(await PlaybuxSBT.tokenSupplyByType('1')).to.equal(2);
 
       // 5
-      await expect(PlaybuxSBT.connect(deployer).mintByTokenId(receiver.address, tokenId)).to.be.revertedWith(
+      await expect(PlaybuxSBT.connect(deployer).mintByTokenId(deployer.address, tokenId)).to.be.revertedWith(
         'ERC721: token already minted'
       );
 
       // 6
-      await expect(PlaybuxSBT.connect(deployer).mintByTokenId(receiver.address, tokenId2.add(1))).to.be.revertedWith(
+      await expect(PlaybuxSBT.connect(deployer).mintByTokenId(deployer.address, tokenId2.add(1))).to.be.revertedWith(
         'Token ID is not available'
       );
 
       // 7
-      const tx4 = await PlaybuxSBT.connect(deployer).mintTo(receiver.address, '1');
+      const tx4 = await PlaybuxSBT.connect(deployer).mintTo(deployer.address, '1');
       const receipt4 = await tx4.wait();
       const tokenId4 = receipt4.events[0].args[2];
       expect(await PlaybuxSBT.totalSupply()).to.equal(3);

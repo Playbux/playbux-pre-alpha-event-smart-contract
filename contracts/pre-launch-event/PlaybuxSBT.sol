@@ -24,6 +24,44 @@ contract PlaybuxSBT is ERC721, IERC5192, ERC721Enumerable, AccessControl {
     }
 
     /**
+     * _substring returns the substring of the given string
+     * @param str string to be sliced
+     * @param startIndex starting index of the substring
+     * @param endIndex ending index of the substring
+     */
+    function _substring(
+        string memory str,
+        uint256 startIndex,
+        uint256 endIndex
+    ) private pure returns (string memory) {
+        bytes memory strBytes = bytes(str);
+        bytes memory result = new bytes(endIndex - startIndex);
+        for (uint256 i = startIndex; i < endIndex; i++) {
+            result[i - startIndex] = strBytes[i];
+        }
+        return string(result);
+    }
+
+    /**
+     * _findTokenId finds the token ID for the given type
+     * @param _type type of the token
+     */
+    function _findTokenId(uint256 _type) private view returns (uint256) {
+        return (_type * 1e18) + tokenSupplyByType[_type];
+    }
+
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal override(ERC721, ERC721Enumerable) {
+        if (soulbound) {
+            require(from == address(0) || to == address(0), "OneDayCashbackNFT: token is soulbound");
+        }
+        super._beforeTokenTransfer(from, to, tokenId);
+    }
+
+    /**
      * setBaseURI sets the base URI for token metadata
      * @param _baseURI The base URI for token metadata
      */
@@ -52,6 +90,30 @@ contract PlaybuxSBT is ERC721, IERC5192, ERC721Enumerable, AccessControl {
         require(_type > 0, "Invalid token type");
         uint256 _tokenId = _findTokenId(_type) + 1;
         tokenSupplyByType[_type]++;
+        _mint(_to, _tokenId);
+    }
+
+    /**
+     * mintByTokenId mints a new token to the given address
+     * Use on cross-chain transfers to mint the token on the destination chain
+     * cannot be used to mint the same token twice
+     * cannot be used to mint a new token that is not the next in the sequence
+     * @param _to address of the future owner of the token
+     * @param _tokenId ID of the token
+     */
+    function mintByTokenId(address _to, uint256 _tokenId) public onlyRole(FACTORY_ROLE) {
+        uint256 _type = findTypeByTokenId(_tokenId);
+        uint256 supplyByType = tokenSupplyByType[_type];
+
+        require(_type > 0, "Invalid token type");
+
+        /*
+         * If the token id is not the next one in the sequence, it means that the token id is already minted.
+         * Use mintTo() to mint the next token in the sequence.
+         */
+        require(findTokenIndexByTokenId(_tokenId) <= supplyByType, "Token ID is not available");
+        require(supplyByType != 0, "Token ID is not available");
+
         _mint(_to, _tokenId);
     }
 
@@ -86,17 +148,6 @@ contract PlaybuxSBT is ERC721, IERC5192, ERC721Enumerable, AccessControl {
         return super.supportsInterface(interfaceId);
     }
 
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 tokenId
-    ) internal override(ERC721, ERC721Enumerable) {
-        if (soulbound) {
-            require(from == address(0) || to == address(0), "OneDayCashbackNFT: token is soulbound");
-        }
-        super._beforeTokenTransfer(from, to, tokenId);
-    }
-
     /**
      * @dev to comply with ERC5192
      * @param _tokenId uint256 ID of the token to query
@@ -116,29 +167,20 @@ contract PlaybuxSBT is ERC721, IERC5192, ERC721Enumerable, AccessControl {
     }
 
     /**
-     * _findTokenId finds the token ID for the given type
-     * @param _type type of the token
+     * findTypeByTokenId finds the type of the token with the given ID
+     * @param _tokenId ID of the token
+     * @return type of the token as a uint256
      */
-    function _findTokenId(uint256 _type) private view returns (uint256) {
-        return (_type * 1e18) + tokenSupplyByType[_type];
+    function findTypeByTokenId(uint256 _tokenId) public pure returns (uint256) {
+        return _tokenId / 1e18;
     }
 
     /**
-     * _substring returns the substring of the given string
-     * @param str string to be sliced
-     * @param startIndex starting index of the substring
-     * @param endIndex ending index of the substring
+     * findTokenIndexByTokenId finds the index of the token with the given ID
+     * @param _tokenId ID of the token
+     * @return index of the token
      */
-    function _substring(
-        string memory str,
-        uint256 startIndex,
-        uint256 endIndex
-    ) private pure returns (string memory) {
-        bytes memory strBytes = bytes(str);
-        bytes memory result = new bytes(endIndex - startIndex);
-        for (uint256 i = startIndex; i < endIndex; i++) {
-            result[i - startIndex] = strBytes[i];
-        }
-        return string(result);
+    function findTokenIndexByTokenId(uint256 _tokenId) public pure returns (uint256) {
+        return _tokenId % 1e18;
     }
 }
