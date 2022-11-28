@@ -5,8 +5,8 @@ import { buildTransaction, getParameters } from '../utils/buildTransaction';
 import { fastForwardBlock } from '../utils/evm';
 
 const {
-  utils: { parseEther, id, hexlify, Interface, randomBytes },
-  constants: { MaxUint256, HashZero, AddressZero },
+  utils: { parseEther },
+  constants: { HashZero },
   Wallet,
 } = ethers;
 

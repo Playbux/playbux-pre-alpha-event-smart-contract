@@ -5,8 +5,8 @@ import { buildTransaction, getParameters } from '../utils/buildTransaction';
 import { fastForwardBlock } from '../utils/evm';
 
 const {
-  utils: { parseEther, id, hexlify, Interface, randomBytes },
-  constants: { MaxUint256, HashZero, AddressZero },
+  utils: { id },
+  constants: { HashZero },
   Wallet,
 } = ethers;
 const FACTORY_ROLE = id('FACTORY_ROLE');

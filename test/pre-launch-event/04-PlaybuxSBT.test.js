@@ -15,9 +15,6 @@ describe('PlaybuxSBT', async () => {
   // Contract
   let PlaybuxSBT;
 
-  // Merkletree
-  let merkleTree;
-
   async function grantRole(address) {
     const tx = await PlaybuxSBT.grantRole(FACTORY_ROLE, address);
     await tx.wait();
@@ -493,6 +490,4 @@ describe('PlaybuxSBT', async () => {
       expect(await PlaybuxSBT.tokenSupplyByType('1')).to.equal(3);
     });
   });
-
-  // royalties fee test, set then get
 });

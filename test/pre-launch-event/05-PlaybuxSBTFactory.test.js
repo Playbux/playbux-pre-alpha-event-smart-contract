@@ -3,9 +3,8 @@ import { ethers } from 'hardhat';
 import { deploy } from '../utils';
 
 const {
-  utils: { parseEther, id, hexlify, Interface, randomBytes },
-  constants: { MaxUint256, HashZero, AddressZero },
-  Wallet,
+  utils: { parseEther, id },
+  constants: { MaxUint256, HashZero },
 } = ethers;
 
 const FACTORY_ROLE = id('FACTORY_ROLE');
@@ -14,10 +13,6 @@ describe('PlaybuxSBTFactory', async function () {
   // Deploy contracts
   before(async function () {
     [this.owner, this.admin, this.userA, this.userB] = await ethers.getSigners();
-
-    // private key of await (ethers.getSigner())[1] of hardhat node
-    this.adminWallet = new Wallet('0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d');
-    this.fakeAdmin = new Wallet('0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603000000000');
   });
 
   beforeEach(async function () {
