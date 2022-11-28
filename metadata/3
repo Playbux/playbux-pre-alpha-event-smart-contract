@@ -1,0 +1,22 @@
+{
+  "name": "Bunny Slippers",
+  "image": "ipfs://QmYNBprW2n8Tb3KjQPUwbY5oH7uyZXZ3W95n5Xad2FTTdT",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "Rare"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Shoes"
+    },
+    {
+      "trait_type": "Costume Set",
+      "value": "Bunny Set"
+    },
+    {
+      "trait_type": "Collection",
+      "value": "Early Bird Quest"
+    }
+  ]
+}

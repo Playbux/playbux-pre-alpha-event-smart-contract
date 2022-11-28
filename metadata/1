@@ -1,0 +1,22 @@
+{
+  "name": "Playbux T-Shirt",
+  "image": "ipfs://QmWvdFD24KJ4q9Jw9Hqd5TBYYQavbybkV58z3zQXmnZtmV",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "Normal"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Shirt"
+    },
+    {
+      "trait_type": "Costume Set",
+      "value": "Playbux Set"
+    },
+    {
+      "trait_type": "Collection",
+      "value": "Early Bird Quest"
+    }
+  ]
+}

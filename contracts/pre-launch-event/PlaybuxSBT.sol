@@ -1,0 +1,144 @@
+// SPDX-License-Identifier: MIT
+
+pragma solidity 0.8.14;
+
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
+import "./interfaces/IERC5192.sol";
+
+contract PlaybuxSBT is ERC721, IERC5192, ERC721Enumerable, AccessControl {
+    using Strings for uint256;
+    mapping(uint256 => uint256) public tokenSupplyByType; // Running number of tokens minted by type
+    bytes32 internal constant FACTORY_ROLE = keccak256("FACTORY_ROLE"); // Factory role is used to mint new NFTs
+    string public baseURI; // Base URI for token metadata
+    bool public soulbound = true;
+
+    event SetBaseURI(string _baseURI);
+    event SetSoulbound(bool _soulbound);
+
+    constructor(string memory _uri) ERC721("Playbux Soulbound Token", "PBS") {
+        baseURI = _uri;
+        _grantRole(DEFAULT_ADMIN_ROLE, _msgSender());
+    }
+
+    /**
+     * setBaseURI sets the base URI for token metadata
+     * @param _baseURI The base URI for token metadata
+     */
+    function setBaseURI(string memory _baseURI) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        baseURI = _baseURI;
+        emit SetBaseURI(_baseURI);
+    }
+
+    /**
+     * tokenURI returns the metadata URI for a given token ID
+     * @param tokenId uint256 ID of the token to query
+     * @return string URI of the token
+     */
+    function tokenURI(uint256 tokenId) public view override returns (string memory) {
+        require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
+        string memory _type = findTypeStrByTokenId(tokenId);
+        return bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, _type)) : "";
+    }
+
+    /**
+     * mintTo mints a new token to the given address
+     * @param _to address of the future owner of the token
+     * @param _type type of the token
+     */
+    function mintTo(address _to, uint256 _type) public onlyRole(FACTORY_ROLE) {
+        require(_type > 0, "Invalid token type");
+        uint256 _tokenId = _findTokenId(_type) + 1;
+        tokenSupplyByType[_type]++;
+        _mint(_to, _tokenId);
+    }
+
+    /**
+     * burnByTokenId burns the token with the given ID
+     * Use on cross-chain transfers to burn the token on the source chain
+     * User must be the owner of the token or approved to burn the token
+     * @param _tokenId ID of the token
+     */
+    function burnByTokenId(uint256 _tokenId) public onlyRole(FACTORY_ROLE) {
+        require(_isApprovedOrOwner(_msgSender(), _tokenId), "ERC721: caller is not token owner or approved");
+
+        _burn(_tokenId);
+    }
+
+    /**
+     * setSoulbound sets whether the tokens are transferable or not
+     * @param _soulbound bool whether the tokens are transferable or not
+     */
+    function setSoulbound(bool _soulbound) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(soulbound != _soulbound, "Already set");
+        soulbound = _soulbound;
+        emit SetSoulbound(_soulbound);
+    }
+
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override(ERC721, ERC721Enumerable, AccessControl)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
+    }
+
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal override(ERC721, ERC721Enumerable) {
+        if (soulbound) {
+            require(from == address(0) || to == address(0), "OneDayCashbackNFT: token is soulbound");
+        }
+        super._beforeTokenTransfer(from, to, tokenId);
+    }
+
+    /**
+     * @dev to comply with ERC5192
+     * @param _tokenId uint256 ID of the token to query
+     * @return uint256 status of the token
+     */
+    function locked(uint256 _tokenId) external view override(IERC5192) returns (bool) {
+        return soulbound;
+    }
+
+    /**
+     * findTypeStrByTokenId finds the type of the token with the given ID
+     * @param _tokenId ID of the token
+     * @return type of the token as a string
+     */
+    function findTypeStrByTokenId(uint256 _tokenId) public pure returns (string memory) {
+        return _substring(_tokenId.toString(), 0, bytes(_tokenId.toString()).length - 18);
+    }
+
+    /**
+     * _findTokenId finds the token ID for the given type
+     * @param _type type of the token
+     */
+    function _findTokenId(uint256 _type) private view returns (uint256) {
+        return (_type * 1e18) + tokenSupplyByType[_type];
+    }
+
+    /**
+     * _substring returns the substring of the given string
+     * @param str string to be sliced
+     * @param startIndex starting index of the substring
+     * @param endIndex ending index of the substring
+     */
+    function _substring(
+        string memory str,
+        uint256 startIndex,
+        uint256 endIndex
+    ) private pure returns (string memory) {
+        bytes memory strBytes = bytes(str);
+        bytes memory result = new bytes(endIndex - startIndex);
+        for (uint256 i = startIndex; i < endIndex; i++) {
+            result[i - startIndex] = strBytes[i];
+        }
+        return string(result);
+    }
+}
