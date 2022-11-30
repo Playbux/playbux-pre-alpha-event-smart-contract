@@ -5,17 +5,17 @@ const {
 const FACTORY_ROLE = id('FACTORY_ROLE');
 
 async function main() {
-  const OneDayCashbackNFT = await ethers.getContract('OneDayCashbackNFT');
-  const OneDayCashbackFactory = await ethers.getContract('OneDayCashbackFactory');
+  const PlaybuxSBT = await ethers.getContract('PlaybuxSBT');
+  const PlaybuxSBTFactory = await ethers.getContract('PlaybuxSBTFactory');
   let tx;
 
   // grantRole
-  tx = await OneDayCashbackNFT.grantRole(FACTORY_ROLE, OneDayCashbackFactory.address);
+  tx = await PlaybuxSBT.grantRole(FACTORY_ROLE, PlaybuxSBTFactory.address);
   await tx.wait();
   console.log('role granted', tx.hash);
 
   // unpause
-  tx = await OneDayCashbackFactory.unpause();
+  tx = await PlaybuxSBTFactory.unpause();
   await tx.wait();
   console.log('unpaused', tx.hash);
 }

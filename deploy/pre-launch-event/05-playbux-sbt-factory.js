@@ -6,9 +6,9 @@ module.exports = async ({ deployments, network }) => {
 
   console.log('deployer', deployer.address);
   const BUSD = await ethers.getContract('MockBUSD');
-  const OneDayNFT = await ethers.getContract('OneDayCashbackNFT');
+  const PlaybuxSBT = await ethers.getContract('PlaybuxSBT');
 
-  const args = [BUSD.address, OneDayNFT.address];
+  const args = [BUSD.address, PlaybuxSBT.address];
 
   await deploy('PlaybuxSBTFactory', {
     contract: 'PlaybuxSBTFactory',
