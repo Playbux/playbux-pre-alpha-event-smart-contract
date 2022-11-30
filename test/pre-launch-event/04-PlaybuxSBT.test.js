@@ -32,67 +32,47 @@ describe('PlaybuxSBT', async () => {
   });
 
   describe('## mintTo method', async () => {
-    it('should be get id correctly when call 20 times with tokenType 1', async () => {
+    it('should be get id correctly when mint with tokenType 1', async () => {
       const [deployer, minter, receiver] = await ethers.getSigners();
-      for (let i = 0; i < 20; i++) {
-        const expectedId = ethers.BigNumber.from(`1000000000000000001`)
-          .add(ethers.BigNumber.from(`${i}`))
-          .toString();
+      const expectedId = ethers.BigNumber.from(`1000000000000000001`);
 
-        await expect(PlaybuxSBT.connect(deployer).mintTo(receiver.address, '1'))
-          .to.emit(PlaybuxSBT, 'Transfer')
-          .withArgs(ethers.constants.AddressZero, receiver.address, expectedId);
-      }
+      await expect(PlaybuxSBT.connect(deployer).mintTo(receiver.address, '1'))
+        .to.emit(PlaybuxSBT, 'Transfer')
+        .withArgs(ethers.constants.AddressZero, receiver.address, expectedId);
     });
 
-    it('should be get id correctly when call 20 times with tokenType 2', async () => {
+    it('should be get id correctly when mint with tokenType 2', async () => {
       const [deployer, minter, receiver] = await ethers.getSigners();
-      for (let i = 0; i < 20; i++) {
-        const expectedId = ethers.BigNumber.from(`2000000000000000001`)
-          .add(ethers.BigNumber.from(`${i}`))
-          .toString();
+      const expectedId = ethers.BigNumber.from(`2000000000000000001`);
 
-        await expect(PlaybuxSBT.connect(deployer).mintTo(receiver.address, '2'))
-          .to.emit(PlaybuxSBT, 'Transfer')
-          .withArgs(ethers.constants.AddressZero, receiver.address, expectedId);
-      }
+      await expect(PlaybuxSBT.connect(deployer).mintTo(receiver.address, '2'))
+        .to.emit(PlaybuxSBT, 'Transfer')
+        .withArgs(ethers.constants.AddressZero, receiver.address, expectedId);
     });
 
-    it('should be get id correctly when call 20 times with tokenType 3', async () => {
+    it('should be get id correctly when mint with tokenType 3', async () => {
       const [deployer, minter, receiver] = await ethers.getSigners();
-      for (let i = 0; i < 20; i++) {
-        const expectedId = ethers.BigNumber.from(`3000000000000000001`)
-          .add(ethers.BigNumber.from(`${i}`))
-          .toString();
+      const expectedId = ethers.BigNumber.from(`3000000000000000001`);
 
-        await expect(PlaybuxSBT.connect(deployer).mintTo(receiver.address, '3'))
-          .to.emit(PlaybuxSBT, 'Transfer')
-          .withArgs(ethers.constants.AddressZero, receiver.address, expectedId);
-      }
+      await expect(PlaybuxSBT.connect(deployer).mintTo(receiver.address, '3'))
+        .to.emit(PlaybuxSBT, 'Transfer')
+        .withArgs(ethers.constants.AddressZero, receiver.address, expectedId);
     });
 
-    it('should be get id correctly when call 20 times with tokenType 9', async () => {
+    it('should be get id correctly when mint with tokenType 9', async () => {
       const [deployer, minter, receiver] = await ethers.getSigners();
-      for (let i = 0; i < 20; i++) {
-        const expectedId = ethers.BigNumber.from(`9` + `000000000000000001`)
-          .add(ethers.BigNumber.from(`${i}`))
-          .toString();
-        await expect(PlaybuxSBT.connect(deployer).mintTo(receiver.address, '9'))
-          .to.emit(PlaybuxSBT, 'Transfer')
-          .withArgs(ethers.constants.AddressZero, receiver.address, expectedId);
-      }
+      const expectedId = ethers.BigNumber.from(`9` + `000000000000000001`).toString();
+      await expect(PlaybuxSBT.connect(deployer).mintTo(receiver.address, '9'))
+        .to.emit(PlaybuxSBT, 'Transfer')
+        .withArgs(ethers.constants.AddressZero, receiver.address, expectedId);
     });
 
-    it('should be get id correctly when call 20 times with tokenType 100', async () => {
+    it('should be get id correctly when mint with tokenType 100', async () => {
       const [deployer, minter, receiver] = await ethers.getSigners();
-      for (let i = 0; i < 20; i++) {
-        const expectedId = ethers.BigNumber.from(`100` + `000000000000000001`)
-          .add(ethers.BigNumber.from(`${i}`))
-          .toString();
-        await expect(PlaybuxSBT.connect(deployer).mintTo(receiver.address, '100'))
-          .to.emit(PlaybuxSBT, 'Transfer')
-          .withArgs(ethers.constants.AddressZero, receiver.address, expectedId);
-      }
+      const expectedId = ethers.BigNumber.from(`100` + `000000000000000001`).toString();
+      await expect(PlaybuxSBT.connect(deployer).mintTo(receiver.address, '100'))
+        .to.emit(PlaybuxSBT, 'Transfer')
+        .withArgs(ethers.constants.AddressZero, receiver.address, expectedId);
     });
 
     it('should be reverted when call with tokenType 0', async () => {
@@ -112,28 +92,58 @@ describe('PlaybuxSBT', async () => {
       };
 
       it('should be equal 1e18+1 by type 1', async () => {
-        for (let i = 0; i < 20; i++) {
-          await mintAndTestTokenURI('1', URI + '1');
-        }
+        await mintAndTestTokenURI('1', URI + '1');
       });
 
       it('should be equal 2e18+1 by type 2', async () => {
-        for (let i = 0; i < 20; i++) {
-          await mintAndTestTokenURI('2', URI + '2');
-        }
+        await mintAndTestTokenURI('2', URI + '2');
       });
 
       it('should be equal 7e18+1 by type 7', async () => {
-        for (let i = 0; i < 20; i++) {
-          await mintAndTestTokenURI('7', URI + '7');
-        }
+        await mintAndTestTokenURI('7', URI + '7');
       });
 
       it('should be equal 100e18+1 by type 100', async () => {
-        for (let i = 0; i < 20; i++) {
-          await mintAndTestTokenURI('100', URI + '100');
-        }
+        await mintAndTestTokenURI('100', URI + '100');
       });
+
+      it('should be able to get non existed tokenURI', async () => {
+        await expect(PlaybuxSBT.tokenURI('9998405605121231545')).to.revertedWith(
+          'ERC721Metadata: URI query for nonexistent token'
+        );
+      });
+    });
+  });
+
+  describe('## transfer', async () => {
+    it('should not able to transfer unless burn or mint', async () => {
+      const [deployer, minter, receiver] = await ethers.getSigners();
+      const tx = await PlaybuxSBT.connect(deployer).mintTo(receiver.address, '1');
+      const receipt = await tx.wait();
+      const tokenId = receipt.events[0].args[2];
+      await expect(
+        PlaybuxSBT.connect(receiver).transferFrom(receiver.address, deployer.address, tokenId)
+      ).to.revertedWith('PlaybuxSBT: token is soulbound');
+    });
+
+    it('should be able to transfer using burn', async () => {
+      const [deployer, minter, receiver] = await ethers.getSigners();
+      const tx = await PlaybuxSBT.connect(deployer).mintTo(receiver.address, '1');
+      const receipt = await tx.wait();
+      const tokenId = receipt.events[0].args[2];
+      await PlaybuxSBT.grantRole(FACTORY_ROLE, receiver.address); // act as factory for testing purpose
+      await expect(PlaybuxSBT.connect(receiver).burnByTokenId(tokenId)).to.emit(PlaybuxSBT, 'Transfer');
+    });
+  });
+
+  describe('## locked', async () => {
+    it('should always return true because all of them are soulbound token', async () => {
+      const [deployer, minter, receiver] = await ethers.getSigners();
+      const expectedId = ethers.BigNumber.from(`1000000000000000001`);
+
+      await PlaybuxSBT.connect(deployer).mintTo(receiver.address, '1');
+      const locked = await PlaybuxSBT.locked(expectedId);
+      expect(locked).to.be.true;
     });
   });
 
@@ -157,26 +167,30 @@ describe('PlaybuxSBT', async () => {
       expect(supply).to.equal(1);
     });
 
-    it('should be return 2 when call with tokenType 1 after minting 2 NFT', async () => {
+    it('should be return 2 when call with tokenType 1 and 2 after minting 2 NFT', async () => {
       const [deployer, minter, receiver] = await ethers.getSigners();
       await PlaybuxSBT.connect(deployer).mintTo(receiver.address, '1');
-      await PlaybuxSBT.connect(deployer).mintTo(receiver.address, '1');
-      const supply = await PlaybuxSBT.tokenSupplyByType('1');
-      expect(supply).to.equal(2);
+      await PlaybuxSBT.connect(deployer).mintTo(receiver.address, '2');
+      const supply1 = await PlaybuxSBT.tokenSupplyByType('1');
+      expect(supply1).to.equal(1);
+      const supply2 = await PlaybuxSBT.tokenSupplyByType('2');
+      expect(supply2).to.equal(1);
     });
 
-    it('should be return 2 when call with tokenType 1 after minting 2 NFT and burn 1 NFT', async () => {
+    it('should be return 1 when mint with tokenType 1 and 2 and burn 1 NFT', async () => {
       const [deployer, minter, receiver] = await ethers.getSigners();
       expect(await PlaybuxSBT.totalSupply()).to.equal(0);
       await PlaybuxSBT.connect(deployer).mintTo(deployer.address, '1');
-      await PlaybuxSBT.connect(deployer).mintTo(deployer.address, '1');
+      await PlaybuxSBT.connect(deployer).mintTo(deployer.address, '2');
       expect(await PlaybuxSBT.totalSupply()).to.equal(2);
-      expect(await PlaybuxSBT.tokenSupplyByType('1')).to.equal(2);
+      expect(await PlaybuxSBT.tokenSupplyByType('1')).to.equal(1);
       const tokenId = await PlaybuxSBT.tokenOfOwnerByIndex(deployer.address, 0);
       // transfer to burn address
       await PlaybuxSBT.connect(deployer).burnByTokenId(tokenId);
-      const supply = await PlaybuxSBT.tokenSupplyByType('1');
-      expect(supply).to.equal(2);
+      const supply1 = await PlaybuxSBT.tokenSupplyByType('1');
+      expect(supply1).to.equal(1); // still 1, because burn is not counted
+      const supply2 = await PlaybuxSBT.tokenSupplyByType('2');
+      expect(supply2).to.equal(1);
       expect(await PlaybuxSBT.totalSupply()).to.equal(1);
     });
   });
@@ -274,6 +288,20 @@ describe('PlaybuxSBT', async () => {
       await expect(PlaybuxSBT.connect(deployer).mintByTokenId(receiver.address, '1000000000000000002')).to.revertedWith(
         'Token ID is not available'
       );
+    });
+
+    it('should be able to mint by token id if never minted this type before', async () => {
+      const [deployer, minter, receiver] = await ethers.getSigners();
+      await expect(PlaybuxSBT.connect(deployer).mintByTokenId(receiver.address, '1000000000000000001')).to.revertedWith(
+        'This type of token has not been minted yet'
+      );
+    });
+
+    it('should be able to mint by token id if minted this type before', async () => {
+      const [deployer, minter, receiver] = await ethers.getSigners();
+      await PlaybuxSBT.connect(deployer).mintTo(deployer.address, '1');
+      await PlaybuxSBT.connect(deployer).burnByTokenId('1000000000000000001');
+      await PlaybuxSBT.connect(deployer).mintByTokenId(deployer.address, '1000000000000000001');
     });
   });
 
@@ -406,24 +434,20 @@ describe('PlaybuxSBT', async () => {
       expect(tokenIdex).to.equal(1);
     });
 
-    it('should be return 2 when mint type 1 twice', async () => {
+    it('should not be able to mint type 1 twice', async () => {
       const [deployer, minter, receiver] = await ethers.getSigners();
       await PlaybuxSBT.connect(deployer).mintTo(receiver.address, '1');
-      const tx = await PlaybuxSBT.connect(deployer).mintTo(receiver.address, '1');
-      const receipt = await tx.wait();
-      const tokenId = receipt.events[0].args[2];
-      const tokenIdex = await PlaybuxSBT.findTokenIndexByTokenId(tokenId);
-      expect(tokenIdex).to.equal(2);
+      await expect(PlaybuxSBT.connect(deployer).mintTo(receiver.address, '1')).to.revertedWith(
+        'Owner already has token of this type'
+      );
     });
 
-    it('should be return 2 when mint type 99999 twice', async () => {
+    it('should not be able to mint type 99999 twice', async () => {
       const [deployer, minter, receiver] = await ethers.getSigners();
       await PlaybuxSBT.connect(deployer).mintTo(receiver.address, '99999');
-      const tx = await PlaybuxSBT.connect(deployer).mintTo(receiver.address, '99999');
-      const receipt = await tx.wait();
-      const tokenId = receipt.events[0].args[2];
-      const tokenIdex = await PlaybuxSBT.findTokenIndexByTokenId(tokenId);
-      expect(tokenIdex).to.equal(2);
+      await expect(PlaybuxSBT.connect(deployer).mintTo(receiver.address, '99999')).to.revertedWith(
+        'Owner already has token of this type'
+      );
     });
 
     it('should not round up if type is 88888 and mint at 900000000000003623', async () => {
@@ -453,7 +477,7 @@ describe('PlaybuxSBT', async () => {
       expect(await PlaybuxSBT.totalSupply()).to.equal(1);
 
       // 2
-      const tx2 = await PlaybuxSBT.connect(deployer).mintTo(deployer.address, '1');
+      const tx2 = await PlaybuxSBT.connect(deployer).mintTo(deployer.address, '2');
       const receipt2 = await tx2.wait();
       const tokenId2 = receipt2.events[0].args[2];
       expect(await PlaybuxSBT.totalSupply()).to.equal(2);
@@ -461,7 +485,7 @@ describe('PlaybuxSBT', async () => {
       // 3
       await PlaybuxSBT.connect(deployer).burnByTokenId(tokenId);
       const supply = await PlaybuxSBT.tokenSupplyByType('1');
-      expect(supply).to.equal(2);
+      expect(supply).to.equal(1);
       expect(await PlaybuxSBT.totalSupply()).to.equal(1);
 
       // 4
@@ -470,7 +494,7 @@ describe('PlaybuxSBT', async () => {
       const receipt3 = await tx3.wait();
       const tokenId3 = receipt3.events[0].args[2];
       expect(await PlaybuxSBT.totalSupply()).to.equal(2);
-      expect(await PlaybuxSBT.tokenSupplyByType('1')).to.equal(2);
+      expect(await PlaybuxSBT.tokenSupplyByType('1')).to.equal(1); // mint by token id not change tokenSupplyByType because it is running number
 
       // 5
       await expect(PlaybuxSBT.connect(deployer).mintByTokenId(deployer.address, tokenId)).to.be.revertedWith(
@@ -483,11 +507,11 @@ describe('PlaybuxSBT', async () => {
       );
 
       // 7
-      const tx4 = await PlaybuxSBT.connect(deployer).mintTo(deployer.address, '1');
-      const receipt4 = await tx4.wait();
-      const tokenId4 = receipt4.events[0].args[2];
-      expect(await PlaybuxSBT.totalSupply()).to.equal(3);
-      expect(await PlaybuxSBT.tokenSupplyByType('1')).to.equal(3);
+      await expect(PlaybuxSBT.connect(deployer).mintTo(deployer.address, '1')).to.be.revertedWith(
+        'Owner already has token of this type'
+      );
+      expect(await PlaybuxSBT.totalSupply()).to.equal(2);
+      expect(await PlaybuxSBT.tokenSupplyByType('1')).to.equal(1);
     });
   });
 });

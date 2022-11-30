@@ -13,7 +13,8 @@ contract PlaybuxSBT is ERC721, IERC5192, ERC721Enumerable, AccessControl {
     mapping(uint256 => uint256) public tokenSupplyByType; // Running number of tokens minted by type
     bytes32 internal constant FACTORY_ROLE = keccak256("FACTORY_ROLE"); // Factory role is used to mint new NFTs
     string public baseURI; // Base URI for token metadata
-    bool public soulbound = true;
+
+    mapping(address => mapping(uint256 => uint256)) public soulboundTokens; // Mapping of soulbound tokens id by address and type
 
     event SetBaseURI(string _baseURI);
     event SetSoulbound(bool _soulbound);
@@ -55,9 +56,7 @@ contract PlaybuxSBT is ERC721, IERC5192, ERC721Enumerable, AccessControl {
         address to,
         uint256 tokenId
     ) internal override(ERC721, ERC721Enumerable) {
-        if (soulbound) {
-            require(from == address(0) || to == address(0), "OneDayCashbackNFT: token is soulbound");
-        }
+        require(from == address(0) || to == address(0), "PlaybuxSBT: token is soulbound");
         super._beforeTokenTransfer(from, to, tokenId);
     }
 
@@ -88,9 +87,13 @@ contract PlaybuxSBT is ERC721, IERC5192, ERC721Enumerable, AccessControl {
      */
     function mintTo(address _to, uint256 _type) public onlyRole(FACTORY_ROLE) {
         require(_type > 0, "Invalid token type");
+        require(!checkOwnerHasTokenByType(_to, _type), "Owner already has token of this type");
         uint256 _tokenId = _findTokenId(_type) + 1;
         tokenSupplyByType[_type]++;
+        soulboundTokens[_to][_type] = _tokenId;
         _mint(_to, _tokenId);
+
+        emit Locked(_tokenId);
     }
 
     /**
@@ -107,14 +110,16 @@ contract PlaybuxSBT is ERC721, IERC5192, ERC721Enumerable, AccessControl {
 
         require(_type > 0, "Invalid token type");
 
+        require(supplyByType != 0, "This type of token has not been minted yet");
         /*
          * If the token id is not the next one in the sequence, it means that the token id is already minted.
          * Use mintTo() to mint the next token in the sequence.
          */
         require(findTokenIndexByTokenId(_tokenId) <= supplyByType, "Token ID is not available");
-        require(supplyByType != 0, "Token ID is not available");
-
+        soulboundTokens[_to][_type] = _tokenId;
         _mint(_to, _tokenId);
+
+        emit Locked(_tokenId);
     }
 
     /**
@@ -125,18 +130,9 @@ contract PlaybuxSBT is ERC721, IERC5192, ERC721Enumerable, AccessControl {
      */
     function burnByTokenId(uint256 _tokenId) public onlyRole(FACTORY_ROLE) {
         require(_isApprovedOrOwner(_msgSender(), _tokenId), "ERC721: caller is not token owner or approved");
-
+        uint256 _type = findTypeByTokenId(_tokenId);
+        soulboundTokens[_msgSender()][_type] = 0;
         _burn(_tokenId);
-    }
-
-    /**
-     * setSoulbound sets whether the tokens are transferable or not
-     * @param _soulbound bool whether the tokens are transferable or not
-     */
-    function setSoulbound(bool _soulbound) external onlyRole(DEFAULT_ADMIN_ROLE) {
-        require(soulbound != _soulbound, "Already set");
-        soulbound = _soulbound;
-        emit SetSoulbound(_soulbound);
     }
 
     function supportsInterface(bytes4 interfaceId)
@@ -154,7 +150,7 @@ contract PlaybuxSBT is ERC721, IERC5192, ERC721Enumerable, AccessControl {
      * @return uint256 status of the token
      */
     function locked(uint256 _tokenId) external view override(IERC5192) returns (bool) {
-        return soulbound;
+        return true; // all tokens are locked
     }
 
     /**
@@ -182,5 +178,9 @@ contract PlaybuxSBT is ERC721, IERC5192, ERC721Enumerable, AccessControl {
      */
     function findTokenIndexByTokenId(uint256 _tokenId) public pure returns (uint256) {
         return _tokenId % 1e18;
+    }
+
+    function checkOwnerHasTokenByType(address _owner, uint256 _type) public view returns (bool) {
+        return soulboundTokens[_owner][_type] > 0;
     }
 }
