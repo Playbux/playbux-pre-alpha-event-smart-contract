@@ -13,7 +13,7 @@ contract PlaybuxQuestNFT is ERC721, ERC721Enumerable, ERC2981, AccessControl {
 
     bytes32 internal constant FACTORY_ROLE = keccak256("FACTORY_ROLE"); // Factory role is used to mint new NFTs
 
-    mapping(uint256 => uint256) public tokenSupplyByType; // Running number of tokens minted by type
+    mapping(uint256 => uint256) public runningNumberByType; // Running number of tokens minted by type
     string public baseURI; // Base URI for token metadata
 
     constructor(
@@ -50,7 +50,7 @@ contract PlaybuxQuestNFT is ERC721, ERC721Enumerable, ERC2981, AccessControl {
      * @param _type type of the token
      */
     function _findTokenId(uint256 _type) private view returns (uint256) {
-        return (_type * 1e18) + tokenSupplyByType[_type];
+        return (_type * 1e18) + runningNumberByType[_type];
     }
 
     function _beforeTokenTransfer(
@@ -100,7 +100,7 @@ contract PlaybuxQuestNFT is ERC721, ERC721Enumerable, ERC2981, AccessControl {
     function mintTo(address _to, uint256 _type) public onlyRole(FACTORY_ROLE) {
         require(_type > 0, "Invalid token type");
         uint256 _tokenId = _findTokenId(_type) + 1;
-        tokenSupplyByType[_type]++;
+        runningNumberByType[_type]++;
         _mint(_to, _tokenId);
     }
 
@@ -114,7 +114,7 @@ contract PlaybuxQuestNFT is ERC721, ERC721Enumerable, ERC2981, AccessControl {
      */
     function mintByTokenId(address _to, uint256 _tokenId) public onlyRole(FACTORY_ROLE) {
         uint256 _type = findTypeByTokenId(_tokenId);
-        uint256 supplyByType = tokenSupplyByType[_type];
+        uint256 supplyByType = runningNumberByType[_type];
 
         require(_type > 0, "Invalid token type");
 

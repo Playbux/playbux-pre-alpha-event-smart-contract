@@ -145,23 +145,23 @@ describe('Playbux Quest NFT', async () => {
     });
   });
 
-  describe('## tokenSupplyByType', async () => {
+  describe('## runningNumberByType', async () => {
     it('should be return 0 when call with tokenType 0', async () => {
       const [deployer, minter, receiver] = await ethers.getSigners();
-      const supply = await playbuxQuestNFT.tokenSupplyByType('0');
+      const supply = await playbuxQuestNFT.runningNumberByType('0');
       expect(supply).to.equal(0);
     });
 
     it('should be return 0 when call with tokenType 1', async () => {
       const [deployer, minter, receiver] = await ethers.getSigners();
-      const supply = await playbuxQuestNFT.tokenSupplyByType('1');
+      const supply = await playbuxQuestNFT.runningNumberByType('1');
       expect(supply).to.equal(0);
     });
 
     it('should be return 1 when call with tokenType 1 after minting 1 NFT', async () => {
       const [deployer, minter, receiver] = await ethers.getSigners();
       await playbuxQuestNFT.connect(deployer).mintTo(receiver.address, '1');
-      const supply = await playbuxQuestNFT.tokenSupplyByType('1');
+      const supply = await playbuxQuestNFT.runningNumberByType('1');
       expect(supply).to.equal(1);
     });
 
@@ -169,7 +169,7 @@ describe('Playbux Quest NFT', async () => {
       const [deployer, minter, receiver] = await ethers.getSigners();
       await playbuxQuestNFT.connect(deployer).mintTo(receiver.address, '1');
       await playbuxQuestNFT.connect(deployer).mintTo(receiver.address, '1');
-      const supply = await playbuxQuestNFT.tokenSupplyByType('1');
+      const supply = await playbuxQuestNFT.runningNumberByType('1');
       expect(supply).to.equal(2);
     });
 
@@ -179,12 +179,12 @@ describe('Playbux Quest NFT', async () => {
       await playbuxQuestNFT.connect(deployer).mintTo(receiver.address, '1');
       await playbuxQuestNFT.connect(deployer).mintTo(receiver.address, '1');
       expect(await playbuxQuestNFT.totalSupply()).to.equal(2);
-      expect(await playbuxQuestNFT.tokenSupplyByType('1')).to.equal(2);
+      expect(await playbuxQuestNFT.runningNumberByType('1')).to.equal(2);
       const tokenId = await playbuxQuestNFT.tokenOfOwnerByIndex(receiver.address, 0);
       // transfer to burn address
       await playbuxQuestNFT.connect(receiver).transferFrom(receiver.address, deployer.address, tokenId);
       await playbuxQuestNFT.connect(deployer).burnByTokenId(tokenId);
-      const supply = await playbuxQuestNFT.tokenSupplyByType('1');
+      const supply = await playbuxQuestNFT.runningNumberByType('1');
       expect(supply).to.equal(2);
       expect(await playbuxQuestNFT.totalSupply()).to.equal(1);
     });
@@ -472,7 +472,7 @@ describe('Playbux Quest NFT', async () => {
       // 3
       await playbuxQuestNFT.connect(receiver).transferFrom(receiver.address, deployer.address, tokenId);
       await playbuxQuestNFT.connect(deployer).burnByTokenId(tokenId);
-      const supply = await playbuxQuestNFT.tokenSupplyByType('1');
+      const supply = await playbuxQuestNFT.runningNumberByType('1');
       expect(supply).to.equal(2);
       expect(await playbuxQuestNFT.totalSupply()).to.equal(1);
 
@@ -482,7 +482,7 @@ describe('Playbux Quest NFT', async () => {
       const receipt3 = await tx3.wait();
       const tokenId3 = receipt3.events[0].args[2];
       expect(await playbuxQuestNFT.totalSupply()).to.equal(2);
-      expect(await playbuxQuestNFT.tokenSupplyByType('1')).to.equal(2);
+      expect(await playbuxQuestNFT.runningNumberByType('1')).to.equal(2);
 
       // 5
       await expect(playbuxQuestNFT.connect(deployer).mintByTokenId(receiver.address, tokenId)).to.be.revertedWith(
@@ -499,7 +499,7 @@ describe('Playbux Quest NFT', async () => {
       const receipt4 = await tx4.wait();
       const tokenId4 = receipt4.events[0].args[2];
       expect(await playbuxQuestNFT.totalSupply()).to.equal(3);
-      expect(await playbuxQuestNFT.tokenSupplyByType('1')).to.equal(3);
+      expect(await playbuxQuestNFT.runningNumberByType('1')).to.equal(3);
     });
   });
 

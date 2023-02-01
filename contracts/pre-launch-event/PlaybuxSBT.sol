@@ -10,7 +10,7 @@ import "./interfaces/IERC5192.sol";
 
 contract PlaybuxSBT is ERC721, IERC5192, ERC721Enumerable, AccessControl {
     using Strings for uint256;
-    mapping(uint256 => uint256) public tokenSupplyByType; // Running number of tokens minted by type
+    mapping(uint256 => uint256) public runningNumberByType; // Running number of tokens minted by type
     bytes32 internal constant FACTORY_ROLE = keccak256("FACTORY_ROLE"); // Factory role is used to mint new NFTs
     string public baseURI; // Base URI for token metadata
 
@@ -48,7 +48,7 @@ contract PlaybuxSBT is ERC721, IERC5192, ERC721Enumerable, AccessControl {
      * @param _type type of the token
      */
     function _findTokenId(uint256 _type) private view returns (uint256) {
-        return (_type * 1e18) + tokenSupplyByType[_type];
+        return (_type * 1e18) + runningNumberByType[_type];
     }
 
     function _beforeTokenTransfer(
@@ -89,7 +89,7 @@ contract PlaybuxSBT is ERC721, IERC5192, ERC721Enumerable, AccessControl {
         require(_type > 0, "Invalid token type");
         require(!checkOwnerHasTokenByType(_to, _type), "Owner already has token of this type");
         uint256 _tokenId = _findTokenId(_type) + 1;
-        tokenSupplyByType[_type]++;
+        runningNumberByType[_type]++;
         soulboundTokens[_to][_type] = _tokenId;
         _mint(_to, _tokenId);
 
@@ -106,7 +106,7 @@ contract PlaybuxSBT is ERC721, IERC5192, ERC721Enumerable, AccessControl {
      */
     function mintByTokenId(address _to, uint256 _tokenId) public onlyRole(FACTORY_ROLE) {
         uint256 _type = findTypeByTokenId(_tokenId);
-        uint256 supplyByType = tokenSupplyByType[_type];
+        uint256 supplyByType = runningNumberByType[_type];
 
         require(_type > 0, "Invalid token type");
 
