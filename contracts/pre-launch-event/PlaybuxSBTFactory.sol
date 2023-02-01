@@ -20,6 +20,8 @@ contract PlaybuxSBTFactory is AccessControl, Pausable, ReentrancyGuard {
     event AdminChanged(address oldAdmin, address newAdmin);
 
     constructor(IERC20 _busd, IPlaybuxSBT _playbuxSBT) {
+        require(address(_busd) != address(0), "BUSD address is invalid");
+        require(address(_playbuxSBT) != address(0), "Playbux SBT address is invalid");
         busd = _busd;
         playbuxSBT = _playbuxSBT;
         _grantRole(DEFAULT_ADMIN_ROLE, _msgSender());

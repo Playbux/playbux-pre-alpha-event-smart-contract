@@ -27,6 +27,8 @@ contract BUSDFactory is ContextMixin, AccessControl, Pausable, ReentrancyGuard, 
     event AdminChanged(address oldAdmin, address newAdmin);
 
     constructor(IERC20 _busd, address _admin) {
+        require(address(_busd) != address(0), "BUSD address is invalid");
+        require(_admin != address(0), "Admin address is invalid");
         busd = _busd;
         admin = _admin;
         _grantRole(DEFAULT_ADMIN_ROLE, _msgSender());
@@ -80,6 +82,7 @@ contract BUSDFactory is ContextMixin, AccessControl, Pausable, ReentrancyGuard, 
     }
 
     function setAdmin(address _admin) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(_admin != address(0), "Admin address is invalid");
         address _oldAdmin = admin;
         admin = _admin;
 
