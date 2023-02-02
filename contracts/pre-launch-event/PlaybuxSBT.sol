@@ -146,10 +146,9 @@ contract PlaybuxSBT is ERC721, IERC5192, ERC721Enumerable, AccessControl {
 
     /**
      * @dev to comply with ERC5192
-     * @param _tokenId uint256 ID of the token to query
-     * @return uint256 status of the token
+     * @return bool status of the token
      */
-    function locked(uint256 _tokenId) external view override(IERC5192) returns (bool) {
+    function locked(uint256) external pure override(IERC5192) returns (bool) {
         return true; // all tokens are locked
     }
 
