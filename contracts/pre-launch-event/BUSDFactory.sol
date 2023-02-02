@@ -50,6 +50,7 @@ contract BUSDFactory is ContextMixin, AccessControl, Pausable, ReentrancyGuard, 
         if (block.number - lastWithdraw[_receiver] > BLOCK_PER_DAY) {
             require(_amount <= withdrawalLimitPerDay, "Withdrawal limit exceeded");
             withdrawAmount[_receiver] = 0; // reset amount
+            lastWithdraw[_receiver] = block.number;
         } else {
             require(
                 withdrawAmount[_receiver] + _amount <= withdrawalLimitPerDay,
@@ -58,7 +59,6 @@ contract BUSDFactory is ContextMixin, AccessControl, Pausable, ReentrancyGuard, 
         }
 
         withdrawAmount[_receiver] += _amount;
-        lastWithdraw[_receiver] = block.number;
         busd.transfer(_receiver, _amount);
 
         emit Withdraw(_transactionId, _receiver, _amount);

@@ -51,12 +51,12 @@ contract NFTFactory is ContextMixin, AccessControl, Pausable, ReentrancyGuard, N
         if (block.number - lastMint[_receiver] > BLOCK_PER_DAY) {
             require(_amount <= mintLimitPerDay, "Minting limit exceeded");
             mintAmount[_receiver] = 0; // reset amount
+            lastMint[_receiver] = block.number;
         } else {
             require(mintAmount[_receiver] + _amount <= mintLimitPerDay, "Minting limit per day is exceeded");
         }
 
         mintAmount[_receiver] += _amount;
-        lastMint[_receiver] = block.number;
 
         for (uint256 i = 0; i < _amount; i++) {
             nft.mintTo(_receiver, _type);
