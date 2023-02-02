@@ -12,7 +12,6 @@ import "../meta-transactions/NativeMetaTransaction.sol";
 contract NFTFactory is ContextMixin, AccessControl, Pausable, ReentrancyGuard, NativeMetaTransaction {
     string public constant name = "Playbux NFT Factory";
     uint256 public constant BLOCK_PER_DAY = 28000;
-    bytes32 internal constant FACTORY_ROLE = keccak256("FACTORY_ROLE");
 
     IPlaybuxQuestNFT public immutable nft;
 
