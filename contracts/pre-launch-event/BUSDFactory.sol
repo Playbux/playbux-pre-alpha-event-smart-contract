@@ -6,10 +6,12 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "../meta-transactions/ContextMixin.sol";
 import "../meta-transactions/NativeMetaTransaction.sol";
 
 contract BUSDFactory is ContextMixin, AccessControl, Pausable, ReentrancyGuard, NativeMetaTransaction {
+    using SafeERC20 for IERC20;
     string public constant name = "Playbux BUSD Factory";
     uint256 public constant BLOCK_PER_DAY = 28000;
 
@@ -27,6 +29,8 @@ contract BUSDFactory is ContextMixin, AccessControl, Pausable, ReentrancyGuard, 
     event AdminChanged(address oldAdmin, address newAdmin);
 
     constructor(IERC20 _busd, address _admin) {
+        require(address(_busd) != address(0), "BUSD address is invalid");
+        require(_admin != address(0), "Admin address is invalid");
         busd = _busd;
         admin = _admin;
         _grantRole(DEFAULT_ADMIN_ROLE, _msgSender());
@@ -59,7 +63,7 @@ contract BUSDFactory is ContextMixin, AccessControl, Pausable, ReentrancyGuard, 
         }
 
         withdrawAmount[_receiver] += _amount;
-        busd.transfer(_receiver, _amount);
+        require(busd.transfer(_receiver, _amount), "Transfer failed");
 
         emit Withdraw(_transactionId, _receiver, _amount);
     }
@@ -80,6 +84,7 @@ contract BUSDFactory is ContextMixin, AccessControl, Pausable, ReentrancyGuard, 
     }
 
     function setAdmin(address _admin) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(_admin != address(0), "Admin address is invalid");
         address _oldAdmin = admin;
         admin = _admin;
 
@@ -87,7 +92,7 @@ contract BUSDFactory is ContextMixin, AccessControl, Pausable, ReentrancyGuard, 
     }
 
     function emergencyWithdraw(IERC20 _token) external onlyRole(DEFAULT_ADMIN_ROLE) {
-        _token.transfer(_msgSender(), _token.balanceOf(address(this)));
+        _token.safeTransfer(_msgSender(), _token.balanceOf(address(this)));
 
         emit EmergencyWithdraw(_msgSender(), _token.balanceOf(address(this)));
     }

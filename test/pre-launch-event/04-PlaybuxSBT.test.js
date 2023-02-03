@@ -147,23 +147,23 @@ describe('PlaybuxSBT', async () => {
     });
   });
 
-  describe('## tokenSupplyByType', async () => {
+  describe('## runningNumberByType', async () => {
     it('should be return 0 when call with tokenType 0', async () => {
       const [deployer, minter, receiver] = await ethers.getSigners();
-      const supply = await PlaybuxSBT.tokenSupplyByType('0');
+      const supply = await PlaybuxSBT.runningNumberByType('0');
       expect(supply).to.equal(0);
     });
 
     it('should be return 0 when call with tokenType 1', async () => {
       const [deployer, minter, receiver] = await ethers.getSigners();
-      const supply = await PlaybuxSBT.tokenSupplyByType('1');
+      const supply = await PlaybuxSBT.runningNumberByType('1');
       expect(supply).to.equal(0);
     });
 
     it('should be return 1 when call with tokenType 1 after minting 1 NFT', async () => {
       const [deployer, minter, receiver] = await ethers.getSigners();
       await PlaybuxSBT.connect(deployer).mintTo(receiver.address, '1');
-      const supply = await PlaybuxSBT.tokenSupplyByType('1');
+      const supply = await PlaybuxSBT.runningNumberByType('1');
       expect(supply).to.equal(1);
     });
 
@@ -171,9 +171,9 @@ describe('PlaybuxSBT', async () => {
       const [deployer, minter, receiver] = await ethers.getSigners();
       await PlaybuxSBT.connect(deployer).mintTo(receiver.address, '1');
       await PlaybuxSBT.connect(deployer).mintTo(receiver.address, '2');
-      const supply1 = await PlaybuxSBT.tokenSupplyByType('1');
+      const supply1 = await PlaybuxSBT.runningNumberByType('1');
       expect(supply1).to.equal(1);
-      const supply2 = await PlaybuxSBT.tokenSupplyByType('2');
+      const supply2 = await PlaybuxSBT.runningNumberByType('2');
       expect(supply2).to.equal(1);
     });
 
@@ -183,13 +183,13 @@ describe('PlaybuxSBT', async () => {
       await PlaybuxSBT.connect(deployer).mintTo(deployer.address, '1');
       await PlaybuxSBT.connect(deployer).mintTo(deployer.address, '2');
       expect(await PlaybuxSBT.totalSupply()).to.equal(2);
-      expect(await PlaybuxSBT.tokenSupplyByType('1')).to.equal(1);
+      expect(await PlaybuxSBT.runningNumberByType('1')).to.equal(1);
       const tokenId = await PlaybuxSBT.tokenOfOwnerByIndex(deployer.address, 0);
       // transfer to burn address
       await PlaybuxSBT.connect(deployer).burnByTokenId(tokenId);
-      const supply1 = await PlaybuxSBT.tokenSupplyByType('1');
+      const supply1 = await PlaybuxSBT.runningNumberByType('1');
       expect(supply1).to.equal(1); // still 1, because burn is not counted
-      const supply2 = await PlaybuxSBT.tokenSupplyByType('2');
+      const supply2 = await PlaybuxSBT.runningNumberByType('2');
       expect(supply2).to.equal(1);
       expect(await PlaybuxSBT.totalSupply()).to.equal(1);
     });
@@ -484,7 +484,7 @@ describe('PlaybuxSBT', async () => {
 
       // 3
       await PlaybuxSBT.connect(deployer).burnByTokenId(tokenId);
-      const supply = await PlaybuxSBT.tokenSupplyByType('1');
+      const supply = await PlaybuxSBT.runningNumberByType('1');
       expect(supply).to.equal(1);
       expect(await PlaybuxSBT.totalSupply()).to.equal(1);
 
@@ -494,7 +494,7 @@ describe('PlaybuxSBT', async () => {
       const receipt3 = await tx3.wait();
       const tokenId3 = receipt3.events[0].args[2];
       expect(await PlaybuxSBT.totalSupply()).to.equal(2);
-      expect(await PlaybuxSBT.tokenSupplyByType('1')).to.equal(1); // mint by token id not change tokenSupplyByType because it is running number
+      expect(await PlaybuxSBT.runningNumberByType('1')).to.equal(1); // mint by token id not change runningNumberByType because it is running number
 
       // 5
       await expect(PlaybuxSBT.connect(deployer).mintByTokenId(deployer.address, tokenId)).to.be.revertedWith(
@@ -511,7 +511,7 @@ describe('PlaybuxSBT', async () => {
         'Owner already has token of this type'
       );
       expect(await PlaybuxSBT.totalSupply()).to.equal(2);
-      expect(await PlaybuxSBT.tokenSupplyByType('1')).to.equal(1);
+      expect(await PlaybuxSBT.runningNumberByType('1')).to.equal(1);
     });
   });
 });
