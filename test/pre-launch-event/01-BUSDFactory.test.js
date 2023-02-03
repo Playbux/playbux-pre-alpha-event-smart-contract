@@ -10,6 +10,8 @@ const {
   Wallet,
 } = ethers;
 
+const BLOCK_PER_DAY = 28000;
+
 describe('BUSDFactory', async function () {
   // Deploy contracts
   before(async function () {
@@ -262,6 +264,689 @@ describe('BUSDFactory', async function () {
       await expect(
         this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature3, r3, s3, v3)
       ).to.not.be.reverted;
+    });
+  });
+
+  describe('withdraw limit in multi scenarios', function () {
+    describe('One withdraw', function () {
+      describe('withdraw after deploy', function () {
+        it('should be able to withdraw 0', async function () {
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, 0],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        });
+
+        it('should be able to withdraw 500', async function () {
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('500')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        });
+
+        it('should be able to withdraw maximum', async function () {
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('5000')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        });
+
+        it('should not be able to withdraw over limit', async function () {
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('5001')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.be.reverted;
+        });
+      });
+
+      describe('withdraw at the middle of the day', function () {
+        beforeEach(async function () {
+          await fastForwardBlock(10000);
+        });
+        it('should be able to withdraw 0', async function () {
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, 0],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        });
+
+        it('should be able to withdraw 500', async function () {
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('500')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        });
+
+        it('should be able to withdraw maximum', async function () {
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('5000')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        });
+
+        it('should not be able to withdraw over limit', async function () {
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('5001')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.be.reverted;
+        });
+      });
+
+      describe('withdraw at the end of the day', function () {
+        beforeEach(async function () {
+          await fastForwardBlock(BLOCK_PER_DAY);
+        });
+        it('should be able to withdraw 0', async function () {
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, 0],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        });
+
+        it('should be able to withdraw 500', async function () {
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('500')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        });
+
+        it('should be able to withdraw maximum', async function () {
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('5000')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        });
+
+        it('should not be able to withdraw over limit', async function () {
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('5001')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.be.reverted;
+        });
+      });
+
+      describe('withdraw after a day', function () {
+        beforeEach(async function () {
+          await fastForwardBlock(BLOCK_PER_DAY + 1);
+        });
+        it('should be able to withdraw 0', async function () {
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, 0],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        });
+
+        it('should be able to withdraw 500', async function () {
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('500')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        });
+
+        it('should be able to withdraw maximum', async function () {
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('5000')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        });
+
+        it('should not be able to withdraw over limit', async function () {
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('5001')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.be.reverted;
+        });
+      });
+    });
+
+    describe('Two withdraws', function () {
+      describe('start withdraw at deploy', function () {
+        beforeEach(async function () {
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('500')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        });
+
+        it('should be able to withdraw during a day in the rest of amount', async function () {
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('4500')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        });
+
+        it('should not be able to withdraw during a day in maximum amount', async function () {
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('5000')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.be.reverted;
+        });
+
+        it('should be able to withdraw after a day in small amount', async function () {
+          await fastForwardBlock(BLOCK_PER_DAY + 1);
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('500')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        });
+
+        it('should be able to withdraw after a day in the maximum amount', async function () {
+          await fastForwardBlock(BLOCK_PER_DAY + 1);
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('5000')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        });
+      });
+
+      describe('start withdraw at the middle of the day', function () {
+        beforeEach(async function () {
+          await fastForwardBlock(BLOCK_PER_DAY / 2);
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('500')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        });
+
+        it('should be able to withdraw during a day in the rest of amount', async function () {
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('4500')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        });
+
+        it('should not be able to withdraw during a day in maximum amount', async function () {
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('5000')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.be.reverted;
+        });
+
+        it('should be able to withdraw after a day in small amount', async function () {
+          await fastForwardBlock(BLOCK_PER_DAY + 1);
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('500')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        });
+
+        it('should be able to withdraw after a day in the maximum amount', async function () {
+          await fastForwardBlock(BLOCK_PER_DAY + 1);
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('5000')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        });
+      });
+
+      describe('start withdraw at the end of the day', function () {
+        beforeEach(async function () {
+          await fastForwardBlock(BLOCK_PER_DAY);
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('500')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        });
+
+        it('should be able to withdraw during a day in the rest of amount', async function () {
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('4500')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        });
+
+        it('should not be able to withdraw during a day in maximum amount', async function () {
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('5000')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.be.reverted;
+        });
+
+        it('should be able to withdraw after a day in small amount', async function () {
+          await fastForwardBlock(BLOCK_PER_DAY + 1);
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('500')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        });
+
+        it('should be able to withdraw after a day in the maximum amount', async function () {
+          await fastForwardBlock(BLOCK_PER_DAY + 1);
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('5000')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        });
+      });
+
+      describe('start withdraw after a day', function () {
+        beforeEach(async function () {
+          await fastForwardBlock(BLOCK_PER_DAY + 1);
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('500')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        });
+
+        it('should be able to withdraw during a day in the rest of amount', async function () {
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('4500')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        });
+
+        it('should not be able to withdraw during a day in maximum amount', async function () {
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('5000')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.be.reverted;
+        });
+
+        it('should be able to withdraw after a day in small amount', async function () {
+          await fastForwardBlock(BLOCK_PER_DAY + 1);
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('500')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        });
+
+        it('should be able to withdraw after a day in the maximum amount', async function () {
+          await fastForwardBlock(BLOCK_PER_DAY + 1);
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('5000')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        });
+      });
+    });
+
+    describe('Multiple withdrawals in one day', function () {
+      it('should be able to withdraw 500 until reach the limit', async function () {
+        for (let i = 0; i < 10; i++) {
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('500')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        }
+      });
+
+      it('should not be able to withdraw 500 after reach the limit', async function () {
+        for (let i = 0; i < 10; i++) {
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('500')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        }
+        // last withdraw
+        const { transactionId, expirationBlock } = await getParameters();
+        const { r, s, v, functionSignature } = await buildTransaction(
+          this.BUSDFactory,
+          'withdraw',
+          [transactionId, expirationBlock, this.userA.address, parseEther('500')],
+          this.adminWallet,
+          this.userA
+        );
+        await expect(
+          this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+        ).to.be.reverted;
+      });
+    });
+
+    describe('Multiple Withdrawals after a day', function () {
+      describe('should be able to withdraw 500 until reach the limit', function () {
+        beforeEach(async function () {
+          for (let i = 0; i < 10; i++) {
+            const { transactionId, expirationBlock } = await getParameters();
+            const { r, s, v, functionSignature } = await buildTransaction(
+              this.BUSDFactory,
+              'withdraw',
+              [transactionId, expirationBlock, this.userA.address, parseEther('500')],
+              this.adminWallet,
+              this.userA
+            );
+            await expect(
+              this.BUSDFactory.connect(this.userA).executeMetaTransaction(
+                this.admin.address,
+                functionSignature,
+                r,
+                s,
+                v
+              )
+            ).to.not.be.reverted;
+
+            await fastForwardBlock(BLOCK_PER_DAY + 1);
+          }
+        });
+
+        it('should be able to withdraw 500 after a day', async function () {
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('500')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        });
+
+        it('should be able to withdraw maximum amount after a day', async function () {
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('5000')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.not.be.reverted;
+        });
+
+        it('should not be able to withdraw 500 after reach the limit', async function () {
+          for (let i = 0; i < 10; i++) {
+            const { transactionId, expirationBlock } = await getParameters();
+            const { r, s, v, functionSignature } = await buildTransaction(
+              this.BUSDFactory,
+              'withdraw',
+              [transactionId, expirationBlock, this.userA.address, parseEther('500')],
+              this.adminWallet,
+              this.userA
+            );
+            await expect(
+              this.BUSDFactory.connect(this.userA).executeMetaTransaction(
+                this.admin.address,
+                functionSignature,
+                r,
+                s,
+                v
+              )
+            ).to.not.be.reverted;
+          }
+
+          // last withdraw
+          const { transactionId, expirationBlock } = await getParameters();
+          const { r, s, v, functionSignature } = await buildTransaction(
+            this.BUSDFactory,
+            'withdraw',
+            [transactionId, expirationBlock, this.userA.address, parseEther('500')],
+            this.adminWallet,
+            this.userA
+          );
+          await expect(
+            this.BUSDFactory.connect(this.userA).executeMetaTransaction(this.admin.address, functionSignature, r, s, v)
+          ).to.be.reverted;
+        });
+      });
     });
   });
 });
