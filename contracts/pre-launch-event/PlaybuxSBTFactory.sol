@@ -6,9 +6,11 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./interfaces/IPlaybuxSBT.sol";
 
 contract PlaybuxSBTFactory is AccessControl, Pausable, ReentrancyGuard {
+    using SafeERC20 for IERC20;
     IERC20 public immutable busd;
     IPlaybuxSBT public immutable playbuxSBT;
 
@@ -57,7 +59,7 @@ contract PlaybuxSBTFactory is AccessControl, Pausable, ReentrancyGuard {
     }
 
     function withdraw(IERC20 _token) external onlyRole(DEFAULT_ADMIN_ROLE) {
-        _token.transfer(_msgSender(), _token.balanceOf(address(this)));
+        _token.safeTransfer(_msgSender(), _token.balanceOf(address(this)));
         emit Withdraw(_msgSender(), _token.balanceOf(address(this)));
     }
 
