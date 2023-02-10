@@ -51,12 +51,12 @@ contract NFTCompound is ContextMixin, AccessControl, Pausable, ReentrancyGuard, 
 
         if (block.number - lastMint[_receiver] > BLOCK_PER_DAY) {
             mintAmount[_receiver] = 0;
+            lastMint[_receiver] = block.number;
         } else {
             require(mintAmount[_receiver] + 1 <= compoundLimitPerDay, "Compound limit per day is exceeded");
         }
 
         mintAmount[_receiver]++;
-        lastMint[_receiver] = block.number;
 
         for (uint256 i = 0; i < _tokenIds.length; i++) {
             nft.burnByTokenId(_tokenIds[i]);
