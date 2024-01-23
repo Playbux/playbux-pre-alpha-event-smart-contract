@@ -16,11 +16,7 @@ contract PlaybuxQuestNFT is ERC721, ERC721Enumerable, ERC2981, AccessControl {
     mapping(uint256 => uint256) public runningNumberByType; // Running number of tokens minted by type
     string public baseURI; // Base URI for token metadata
 
-    constructor(
-        address _receiver,
-        uint96 _feeNumerator,
-        string memory _uri
-    ) ERC721("Playbux Early Bird Quest", "PBN") {
+    constructor(address _receiver, uint96 _feeNumerator, string memory _uri) ERC721("Playbux Early Bird Quest", "PBN") {
         baseURI = _uri;
         _setDefaultRoyalty(_receiver, _feeNumerator);
         _grantRole(DEFAULT_ADMIN_ROLE, _msgSender());
@@ -32,11 +28,7 @@ contract PlaybuxQuestNFT is ERC721, ERC721Enumerable, ERC2981, AccessControl {
      * @param startIndex starting index of the substring
      * @param endIndex ending index of the substring
      */
-    function _substring(
-        string memory str,
-        uint256 startIndex,
-        uint256 endIndex
-    ) private pure returns (string memory) {
+    function _substring(string memory str, uint256 startIndex, uint256 endIndex) private pure returns (string memory) {
         bytes memory strBytes = bytes(str);
         bytes memory result = new bytes(endIndex - startIndex);
         for (uint256 i = startIndex; i < endIndex; i++) {
@@ -140,12 +132,9 @@ contract PlaybuxQuestNFT is ERC721, ERC721Enumerable, ERC2981, AccessControl {
         _burn(_tokenId);
     }
 
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        override(ERC721, ERC721Enumerable, ERC2981, AccessControl)
-        returns (bool)
-    {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view override(ERC721, ERC721Enumerable, ERC2981, AccessControl) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 

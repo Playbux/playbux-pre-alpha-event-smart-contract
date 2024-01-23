@@ -17,6 +17,54 @@ Playbux is a web3 platform that integrates various "earn while you play" feature
 ## Introduction
 This repository contains smart contracts for Playbux's pre-alpha event on the Binance Smart Chain, facilitating various functionalities in the Playbux ecosystem.
 
+## Contract Address
+
+### PlaybuxQuest
+[0x93C2260EE41b285C9Bbf98c6B9FFfbd3D62fcA36](https://bscscan.com/address/0x93C2260EE41b285C9Bbf98c6B9FFfbd3D62fcA36)
+
+### PlaybuxQuestNFT
+[0xC2A19349D5f451071C3085B90f531D19F190FF21](https://bscscan.com/address/0xC2A19349D5f451071C3085B90f531D19F190FF21)
+
+### AirdropSTETopSpender
+[0x41c5376710d291149E327f17F519835E3bd6b2DE](https://bscscan.com/address/0x41c5376710d291149E327f17F519835E3bd6b2DE)
+
+### BUSDFactory (Deactivated)
+[0xcd5582478e80f5A7a54Dd3ecc89FEF4Bf529c8eb](https://bscscan.com/address/0xcd5582478e80f5A7a54Dd3ecc89FEF4Bf529c8eb)
+
+
+### NFTFactory
+[0x030DEBdF615c3381AbC04ff1CEE4E3b19ba73a35](https://bscscan.com/address/0x030DEBdF615c3381AbC04ff1CEE4E3b19ba73a35)
+
+### NFTUltraFactory
+[0x75E65441F23a708162740e6770fcc081A240a20A](https://bscscan.com/address/0x75E65441F23a708162740e6770fcc081A240a20A)
+
+### PlaybuxAirdropMathWallet
+[0x69Dff696Dc08FF5DAc71DE0861ff97638D44eB3d](https://bscscan.com/address/0x69Dff696Dc08FF5DAc71DE0861ff97638D44eB3d)
+
+### PlaybuxClaim
+[0x6B9a90bF926D2Eb067614cC542F4bB49BB4eAeFE](https://bscscan.com/address/0x6B9a90bF926D2Eb067614cC542F4bB49BB4eAeFE)
+
+### NFTCompound
+[0xc8Bb8C36860DA0f50689D594b56fdF405c2FaD7a](https://bscscan.com/address/0xc8Bb8C36860DA0f50689D594b56fdF405c2FaD7a)
+
+### PlaybuxUltraNFT
+[0x817e746fdb3fB4fe64bD45f4270b9C8c57991B23](https://bscscan.com/address/0x817e746fdb3fB4fe64bD45f4270b9C8c57991B23)
+
+### InitPlaybuxUltra for sell on Binance
+[0x632431D358B697F7E522b5F3CEEF350d54BD0694](https://bscscan.com/address/0x632431D358B697F7E522b5F3CEEF350d54BD0694)
+
+
+### AirdropWalkToWin
+[0xcd5582478e80f5A7a54Dd3ecc89FEF4Bf529c8eb](https://bscscan.com/address/0xcd5582478e80f5A7a54Dd3ecc89FEF4Bf529c8eb)
+
+### PlaybuxRNG
+[0x19e410ad8cF6964030C6FDe1466C9B4779055e89](https://bscscan.com/address/0x19e410ad8cF6964030C6FDe1466C9B4779055e89)
+
+### USDTFactory
+[0x65BF4d331cFd805691F8511F37036026188F103c](https://bscscan.com/address/0x65BF4d331cFd805691F8511F37036026188F103c)
+
+
+
 ## Contact
 info@playbux.co
 
